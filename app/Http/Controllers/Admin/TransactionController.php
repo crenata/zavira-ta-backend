@@ -8,19 +8,18 @@ use App\Http\Controllers\Controller;
 use App\Models\TransactionHistoryModel;
 use App\Models\TransactionModel;
 use Illuminate\Http\Request;
-use Illuminate\Support\Carbon;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
 
 class TransactionController extends Controller {
-    protected $transactionTable, $transactionHistoryTable;
+    protected string $transactionTable, $transactionHistoryTable;
 
     public function __construct() {
         $this->transactionTable = (new TransactionModel())->getTable();
         $this->transactionHistoryTable = (new TransactionHistoryModel())->getTable();
     }
 
-    public function getData(array $selects = [], array $conditions = [], $isLastYear = false) {
-        $year = $isLastYear ? Carbon::now()->subYears(1)->year : Carbon::now()->year;
+    public function getData(array $conditions = [], $id = null) {
         $detailIds = DB::table("$this->transactionHistoryTable as detail_mx")
             ->selectRaw("max(detail_mx.id) as detail_id, detail_mx.transaction_id")
             ->groupBy("detail_mx.transaction_id")
@@ -28,11 +27,8 @@ class TransactionController extends Controller {
         $detailData = DB::table("$this->transactionHistoryTable as detail_data")
             ->selectRaw("detail_data.id, detail_data.status")
             ->toSql();
-        return TransactionModel::selectRaw(implode(",", array_merge([
-            "to_char(to_timestamp(created_at)::date, 'MON') as label",
-            "extract(month from to_timestamp(created_at)::date) as month",
-            "extract(year from to_timestamp(created_at)::date) as year"
-        ], $selects)))
+        $data = TransactionModel::with("latestHistory", "histories", "ticketBundle.tickets")
+            ->select("$this->transactionTable.*")
             ->leftJoinSub(
                 $detailIds,
                 "detail_max",
@@ -47,12 +43,13 @@ class TransactionController extends Controller {
                 "=",
                 "detail_max.detail_id"
             )
-            ->whereRaw(implode(" and ", array_merge([
-                "extract(year from to_timestamp(created_at)::date) = $year"
-            ], $conditions)))
-            ->groupByRaw("1,2,3")
-            ->orderBy("month")
-            ->get();
+            ->whereRaw(implode(" and ", $conditions))
+            ->orderByDesc("$this->transactionTable.id");
+
+        if (empty($id)) $data = $data->paginate();
+        else $data = $data->find($id);
+
+        return $data;
     }
 
     public function get(Request $request) {
@@ -63,72 +60,69 @@ class TransactionController extends Controller {
         return ResponseHelper::response($data);
     }
 
-    public function getVisitor(Request $request) {
-        $parameters = [
-            [
-                "sum(total_adult + total_child) as total"
-            ], [
-                "detail.status in (" . implode(",", [
-                    MidtransStatusConstant::CHECK_IN,
-                    MidtransStatusConstant::CHECK_OUT
-                ]) . ")"
-            ]
+    public function getManager(Request $request) {
+        $filters = [
+            "detail.status in (" . implode(",", [
+                MidtransStatusConstant::SETTLEMENT,
+                MidtransStatusConstant::CHECK_IN
+            ]) . ")"
         ];
-        $current = $this->getData($parameters[0], $parameters[1]);
-
-        $labels = [];
-        $datasets = [];
-        foreach ($current as $transaction) {
-            array_push($labels, $transaction->label);
-            array_push($datasets, (int) $transaction->total);
+        if (!empty($request->input("search"))) {
+            array_push($filters, "$this->transactionTable.invoice_number = '$request->search'");
         }
 
-        $data = [
-            "labels" => $labels,
-            "datasets" => [
-                [
-                    "label" => "Visitors",
-                    "backgroundColor" => "#F87979",
-                    "data" => $datasets
-                ]
-            ]
-        ];
-
-        return ResponseHelper::response($data);
+        return ResponseHelper::response($this->getData($filters));
     }
 
-    public function getIncome(Request $request) {
-        $parameters = [
-            [
-                "sum(gross_amount) as total"
-            ], [
-                "detail.status in (" . implode(",", [
-                    MidtransStatusConstant::SETTLEMENT,
-                    MidtransStatusConstant::CHECK_IN,
-                    MidtransStatusConstant::CHECK_OUT
-                ]) . ")"
-            ]
-        ];
-        $current = $this->getData($parameters[0], $parameters[1]);
+    public function checkIn(Request $request, $id) {
+        $validator = Validator::make([
+            "id" => $id
+        ], [
+            "id" => "required|numeric|exists:$this->transactionTable,id"
+        ]);
+        if ($validator->fails()) return ResponseHelper::response(null, $validator->errors()->first(), 400);
 
-        $labels = [];
-        $datasets = [];
-        foreach ($current as $transaction) {
-            array_push($labels, $transaction->label);
-            array_push($datasets, (int) $transaction->total);
-        }
+        return DB::transaction(function () use ($id) {
+            $transaction = $this->getData([
+                "detail.status = " . MidtransStatusConstant::SETTLEMENT
+            ], $id);
+            if (empty($transaction->id)) return ResponseHelper::response(null, "Transaction is invalid.", 400);
+            if (!empty($transaction->check_in)) return ResponseHelper::response(null, "Already check in.", 400);
+            $transaction->check_in = time();
+            $transaction->save();
 
-        $data = [
-            "labels" => $labels,
-            "datasets" => [
-                [
-                    "label" => "Income",
-                    "backgroundColor" => "#F87979",
-                    "data" => $datasets
-                ]
-            ]
-        ];
+            TransactionHistoryModel::create([
+                "transaction_id" => $transaction->id,
+                "status" => MidtransStatusConstant::CHECK_IN
+            ]);
 
-        return ResponseHelper::response($data);
+            return ResponseHelper::response();
+        });
+    }
+
+    public function checkOut(Request $request, $id) {
+        $validator = Validator::make([
+            "id" => $id
+        ], [
+            "id" => "required|numeric|exists:$this->transactionTable,id"
+        ]);
+        if ($validator->fails()) return ResponseHelper::response(null, $validator->errors()->first(), 400);
+
+        return DB::transaction(function () use ($id) {
+            $transaction = $this->getData([
+                "detail.status = " . MidtransStatusConstant::CHECK_IN
+            ], $id);
+            if (empty($transaction->id)) return ResponseHelper::response(null, "Transaction is invalid.", 400);
+            if (!empty($transaction->check_out)) return ResponseHelper::response(null, "Already check out.", 400);
+            $transaction->check_out = time();
+            $transaction->save();
+
+            TransactionHistoryModel::create([
+                "transaction_id" => $transaction->id,
+                "status" => MidtransStatusConstant::CHECK_OUT
+            ]);
+
+            return ResponseHelper::response();
+        });
     }
 }
