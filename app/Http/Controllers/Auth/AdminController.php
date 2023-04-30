@@ -35,7 +35,7 @@ class AdminController extends Controller {
             "email" => "required|string|email|unique:$this->adminTable,email",
             "password" => "required|string|min:8",
             "confirm_password" => "required|string|min:8|same:password",
-            "type" => ["required", "numeric", Rule::in([AdminTypeConstant::ADMINISTRATOR, AdminTypeConstant::MANAGER])]
+            "type" => ["required", "numeric", Rule::in([AdminTypeConstant::ADMINISTRATOR, AdminTypeConstant::CHIEF, AdminTypeConstant::STAFF, AdminTypeConstant::MANAGER])]
         ]);
         if ($validator->fails()) return ResponseHelper::response(null, $validator->errors()->first(), 400);
 
@@ -59,7 +59,7 @@ class AdminController extends Controller {
         ]);
         if ($validator->fails()) return ResponseHelper::response(null, $validator->errors()->first(), 400);
 
-        $user = AdminModel::where("email", $request->email)->where("type", AdminTypeConstant::ADMINISTRATOR)->first();
+        $user = AdminModel::where("email", $request->email)->first();
 
         if (!Hash::check($request->password, $user->password)) return ResponseHelper::response(null, "The provided credentials are incorrect.", 401);
 
@@ -74,7 +74,7 @@ class AdminController extends Controller {
             "id" => "required|numeric|exists:$this->adminTable,id",
             "name" => "required|string",
             "email" => "required|string|email",
-            "type" => ["required", "numeric", Rule::in([AdminTypeConstant::ADMINISTRATOR, AdminTypeConstant::MANAGER])]
+            "type" => ["required", "numeric", Rule::in([AdminTypeConstant::ADMINISTRATOR, AdminTypeConstant::CHIEF, AdminTypeConstant::STAFF, AdminTypeConstant::MANAGER])]
         ]);
         if ($validator->fails()) return ResponseHelper::response(null, $validator->errors()->first(), 400);
 
