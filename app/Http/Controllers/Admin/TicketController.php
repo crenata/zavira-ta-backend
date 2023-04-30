@@ -4,26 +4,20 @@ namespace App\Http\Controllers\Admin;
 
 use App\Helpers\ResponseHelper;
 use App\Http\Controllers\Controller;
-use App\Models\TicketBundleTicketModel;
 use App\Models\TicketModel;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
 class TicketController extends Controller {
-    protected $ticketTable;
+    protected string $ticketTable;
 
     public function __construct() {
         $this->ticketTable = (new TicketModel())->getTable();
     }
 
     public function get(Request $request) {
-        $tickets = TicketModel::orderByDesc("id")
-            ->paginate()
-            ->through(function ($data) {
-                $data->bundles = TicketBundleTicketModel::where("ticket_id", $data->id)->pluck("ticket_bundle_id")->toArray();
-                return $data;
-            });
+        $tickets = TicketModel::orderByDesc("id")->paginate();
 
         return ResponseHelper::response($tickets);
     }
@@ -31,11 +25,8 @@ class TicketController extends Controller {
     public function set(Request $request, TicketModel $ticket) {
         return DB::transaction(function () use ($request, $ticket) {
             $ticket->name = $request->name;
-            $ticket->adult_price = $request->adult_price;
-            $ticket->child_price = $request->child_price;
+            $ticket->price = $request->price;
             $ticket->save();
-
-            $ticket->ticketBundles()->sync($request->bundles);
 
             return ResponseHelper::response($ticket);
         });
@@ -44,9 +35,7 @@ class TicketController extends Controller {
     public function add(Request $request) {
         $validator = Validator::make($request->all(), [
             "name" => "required|string",
-            "adult_price" => "required|numeric|min:1",
-            "child_price" => "required|numeric|min:1",
-            "bundles" => "required|array|min:1"
+            "price" => "required|numeric|min:1"
         ]);
         if ($validator->fails()) return ResponseHelper::response(null, $validator->errors()->first(), 400);
 
@@ -57,9 +46,7 @@ class TicketController extends Controller {
         $validator = Validator::make($request->all(), [
             "id" => "required|numeric|exists:$this->ticketTable,id",
             "name" => "required|string",
-            "adult_price" => "required|numeric|min:1",
-            "child_price" => "required|numeric|min:1",
-            "bundles" => "required|array|min:1"
+            "price" => "required|numeric|min:1"
         ]);
         if ($validator->fails()) return ResponseHelper::response(null, $validator->errors()->first(), 400);
 
@@ -74,14 +61,8 @@ class TicketController extends Controller {
         ]);
         if ($validator->fails()) return ResponseHelper::response(null, $validator->errors()->first(), 400);
 
-        return DB::transaction(function () use ($id) {
-            $ticket = TicketModel::find($id);
-            if (!empty($ticket->id)) {
-                $ticket->ticketBundles()->detach();
-                $ticket->delete();
-            }
+        TicketModel::find($id)->delete();
 
-            return ResponseHelper::response();
-        });
+        return ResponseHelper::response();
     }
 }
