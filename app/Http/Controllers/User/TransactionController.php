@@ -9,7 +9,7 @@ use Illuminate\Http\Request;
 
 class TransactionController extends Controller {
     public function get(Request $request) {
-        $data = TransactionModel::with("latestHistory", "histories", "ticketBundle.tickets")
+        $data = TransactionModel::with("latestHistory", "histories")
             ->orderByDesc("id")
             ->paginate();
 
