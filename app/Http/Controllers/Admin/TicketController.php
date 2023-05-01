@@ -25,6 +25,7 @@ class TicketController extends Controller {
     public function set(Request $request, TicketModel $ticket) {
         return DB::transaction(function () use ($request, $ticket) {
             $ticket->name = $request->name;
+            $ticket->description = $request->description;
             $ticket->price = $request->price;
             $ticket->save();
 
@@ -35,7 +36,8 @@ class TicketController extends Controller {
     public function add(Request $request) {
         $validator = Validator::make($request->all(), [
             "name" => "required|string",
-            "price" => "required|numeric|min:1"
+            "price" => "required|numeric|min:1",
+            "description" => "required|string"
         ]);
         if ($validator->fails()) return ResponseHelper::response(null, $validator->errors()->first(), 400);
 
@@ -46,7 +48,8 @@ class TicketController extends Controller {
         $validator = Validator::make($request->all(), [
             "id" => "required|numeric|exists:$this->ticketTable,id",
             "name" => "required|string",
-            "price" => "required|numeric|min:1"
+            "price" => "required|numeric|min:1",
+            "description" => "required|string"
         ]);
         if ($validator->fails()) return ResponseHelper::response(null, $validator->errors()->first(), 400);
 

@@ -73,6 +73,7 @@ class TicketController extends Controller {
                 "invoice_number" => $invoiceNumber,
                 "user_id" => auth()->id(),
                 "name" => $ticket->name,
+                "description" => $ticket->description,
                 "price" => $ticket->price,
                 "snap_url" => $snapUrl
             ]);

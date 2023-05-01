@@ -21,6 +21,7 @@ return new class extends Migration {
             $table->string("invoice_number");
             $table->unsignedBigInteger("user_id");
             $table->string("name");
+            $table->longText("description");
             $table->unsignedBigInteger("price");
             $table->string("snap_url");
             $table->unsignedBigInteger("check_in")->nullable();

@@ -17,6 +17,7 @@ class TicketModel extends BaseModel {
      */
     protected $fillable = [
         "name",
+        "description",
         "price",
         "created_at",
         "updated_at",

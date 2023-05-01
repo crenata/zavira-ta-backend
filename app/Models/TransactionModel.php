@@ -19,6 +19,7 @@ class TransactionModel extends BaseModel {
         "invoice_number",
         "user_id",
         "name",
+        "description",
         "price",
         "snap_url",
         "created_at",

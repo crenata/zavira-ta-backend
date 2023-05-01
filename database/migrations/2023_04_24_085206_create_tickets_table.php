@@ -19,6 +19,7 @@ return new class extends Migration {
             $table->id();
             $table->string("name");
             $table->unsignedBigInteger("price");
+            $table->longText("description");
             $this->timestamps($table);
             $this->softDeletes($table);
         });
