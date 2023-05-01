@@ -10,6 +10,7 @@ Route::namespace(ucfirst(ApiConstant::PREFIX_USER))->group(function () {
     Route::prefix(ApiConstant::PREFIX_STRUCTURE_ORGANIZATION)->group(__DIR__ . "/" . ApiConstant::PREFIX_STRUCTURE_ORGANIZATION . ".php");
     Route::prefix(ApiConstant::PREFIX_ARTICLE)->group(__DIR__ . "/" . ApiConstant::PREFIX_ARTICLE . ".php");
     Route::prefix(ApiConstant::PREFIX_TICKET)->group(__DIR__ . "/" . ApiConstant::PREFIX_TICKET . ".php");
+    Route::prefix(ApiConstant::PREFIX_COMPLAINT)->group(__DIR__ . "/" . ApiConstant::PREFIX_COMPLAINT . ".php");
 
     Route::middleware([TokenConstant::AUTH_SANCTUM, TokenConstant::AUTH_USER])->group(function () {
         Route::prefix(ApiConstant::PREFIX_TRANSACTION)->group(__DIR__ . "/" . ApiConstant::PREFIX_TRANSACTION . ".php");

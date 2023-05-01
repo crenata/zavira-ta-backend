@@ -6,7 +6,6 @@ use App\Helpers\ResponseHelper;
 use App\Http\Controllers\Controller;
 use App\Models\TicketModel;
 use Illuminate\Http\Request;
-use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Validator;
 
 class TicketController extends Controller {
@@ -23,14 +22,12 @@ class TicketController extends Controller {
     }
 
     public function set(Request $request, TicketModel $ticket) {
-        return DB::transaction(function () use ($request, $ticket) {
-            $ticket->name = $request->name;
-            $ticket->description = $request->description;
-            $ticket->price = $request->price;
-            $ticket->save();
+        $ticket->name = $request->name;
+        $ticket->description = $request->description;
+        $ticket->price = $request->price;
+        $ticket->save();
 
-            return ResponseHelper::response($ticket);
-        });
+        return ResponseHelper::response($ticket);
     }
 
     public function add(Request $request) {

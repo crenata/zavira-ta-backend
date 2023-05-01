@@ -12,4 +12,5 @@ class ApiConstant {
     const PREFIX_ARTICLE = "article";
     const PREFIX_TICKET = "ticket";
     const PREFIX_TRANSACTION = "transaction";
+    const PREFIX_COMPLAINT = "complaint";
 }

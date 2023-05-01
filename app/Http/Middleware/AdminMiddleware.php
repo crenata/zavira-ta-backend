@@ -32,6 +32,8 @@ class AdminMiddleware {
             str_contains($path, "auth/delete"),
             str_contains($path, "transaction/get/manager"),
             str_contains($path, "transaction/check"),
+            str_contains($path, "complaint/get"),
+            str_contains($path, "complaint/delete")
             => false,
             default => true
         };
