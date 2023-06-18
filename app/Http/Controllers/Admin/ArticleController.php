@@ -39,7 +39,7 @@ class ArticleController extends Controller {
             "title" => "required|string",
             "description" => "required|string",
             "image" => "required|file|image",
-            "type" => ["required", Rule::in([ArticleTypeConstant::HOME, ArticleTypeConstant::PROGRAM, ArticleTypeConstant::INFORMATION, ArticleTypeConstant::SOP])]
+            "type" => ["required", "numeric", Rule::in([ArticleTypeConstant::HOME, ArticleTypeConstant::PROGRAM, ArticleTypeConstant::INFORMATION, ArticleTypeConstant::SOP])]
         ]);
         if ($validator->fails()) return ResponseHelper::response(null, $validator->errors()->first(), 400);
 
@@ -52,7 +52,7 @@ class ArticleController extends Controller {
             "title" => "required|string",
             "description" => "required|string",
             "image" => "required",
-            "type" => ["required", Rule::in([ArticleTypeConstant::HOME, ArticleTypeConstant::PROGRAM, ArticleTypeConstant::INFORMATION, ArticleTypeConstant::SOP])]
+            "type" => ["required", "numeric", Rule::in([ArticleTypeConstant::HOME, ArticleTypeConstant::PROGRAM, ArticleTypeConstant::INFORMATION, ArticleTypeConstant::SOP])]
         ]);
         if ($validator->fails()) return ResponseHelper::response(null, $validator->errors()->first(), 400);
 

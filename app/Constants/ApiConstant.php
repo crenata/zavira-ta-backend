@@ -13,4 +13,7 @@ class ApiConstant {
     const PREFIX_TICKET = "ticket";
     const PREFIX_TRANSACTION = "transaction";
     const PREFIX_COMPLAINT = "complaint";
+    const PREFIX_PENYU = "penyu";
+    const PREFIX_CONSERVATION = "conservation";
+    const PREFIX_CITY = "city";
 }

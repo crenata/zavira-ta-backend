@@ -1,7 +1,6 @@
 <?php
 
-use App\Models\ComplaintModel;
-use App\Models\UserModel;
+use App\Models\GisModel;
 use App\Traits\MigrationTrait;
 use Illuminate\Database\Migrations\Migration;
 use Illuminate\Database\Schema\Blueprint;
@@ -16,19 +15,14 @@ return new class extends Migration {
      * @return void
      */
     public function up() {
-        Schema::create($this->getTable(new ComplaintModel()), function (Blueprint $table) {
+        Schema::create($this->getTable(new GisModel()), function (Blueprint $table) {
             $table->id();
-            $table->unsignedBigInteger("user_id");
             $table->string("name");
-            $table->string("subject");
+            $table->unsignedBigInteger("wide");
+            $table->string("target");
             $table->longText("description");
-            $table->longText("location");
-            $table->date("date");
-            $table->string("image");
             $this->timestamps($table);
             $this->softDeletes($table);
-
-            $table->foreign("user_id")->references("id")->on($this->getTable(new UserModel()))->onDelete("cascade");
         });
     }
 
@@ -38,6 +32,6 @@ return new class extends Migration {
      * @return void
      */
     public function down() {
-        Schema::dropIfExists($this->getTable(new ComplaintModel()));
+        Schema::dropIfExists($this->getTable(new GisModel()));
     }
 };
