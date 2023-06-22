@@ -60,25 +60,13 @@ class ComplaintController extends Controller {
     public function set(Request $request) {
         $validator = Validator::make($request->all(), [
             "id" => "required|numeric|exists:$this->complaintTable,id",
-            "assignee_id" => "nullable|numeric|exists:$this->complaintTable,id",
-            "status" => ["required", "numeric", Rule::in([ComplaintStatusConstant::PENDING, ComplaintStatusConstant::DROPPED, ComplaintStatusConstant::PROCESSED, ComplaintStatusConstant::RESOLVED])],
-            "tracking_type" => ["required", "numeric", Rule::in([ComplaintTrackingTypeConstant::ASSIGNEE, ComplaintTrackingTypeConstant::STATUS])]
+            "status" => ["required", "numeric", Rule::in([ComplaintStatusConstant::PENDING, ComplaintStatusConstant::DROPPED, ComplaintStatusConstant::PROCESSED, ComplaintStatusConstant::RESOLVED])]
         ]);
         if ($validator->fails()) return ResponseHelper::response(null, $validator->errors()->first(), 400);
 
-        $latestHistory = ComplaintHistoryModel::where("complaint_id", $request->id)->orderByDesc("id")->first();
-        $assigneeId = null;
-        if ($request->tracking_type === ComplaintTrackingTypeConstant::ASSIGNEE) {
-            $assigneeId = $request->assignee_id;
-        } else {
-            if (!empty($latestHistory->assignee_id)) $assigneeId = $latestHistory->assignee_id;
-        }
         ComplaintHistoryModel::create([
             "complaint_id" => $request->id,
-            "assignee_id" => $assigneeId,
-            "modifier_id" => auth()->id(),
-            "status" => $request->status,
-            "tracking_type" => $request->tracking_type
+            "status" => $request->status
         ]);
 
         return ResponseHelper::response();

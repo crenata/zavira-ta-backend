@@ -17,10 +17,7 @@ class ComplaintHistoryModel extends BaseModel {
      */
     protected $fillable = [
         "complaint_id",
-        "assignee_id",
-        "modifier_id",
         "status",
-        "tracking_type",
         "created_at",
         "updated_at",
         "deleted_at"

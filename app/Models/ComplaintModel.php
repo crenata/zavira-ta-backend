@@ -37,7 +37,7 @@ class ComplaintModel extends BaseModel {
     }
 
     public function histories() {
-        return $this->hasMany(ComplaintHistoryModel::class, "complaint_id");
+        return $this->hasMany(ComplaintHistoryModel::class, "complaint_id")->orderByDesc("id");
     }
 
     public function latestHistory() {
