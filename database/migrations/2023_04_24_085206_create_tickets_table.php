@@ -20,6 +20,7 @@ return new class extends Migration {
             $table->string("name");
             $table->unsignedBigInteger("price");
             $table->longText("description");
+            $table->string("image");
             $this->timestamps($table);
             $this->softDeletes($table);
         });

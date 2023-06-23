@@ -19,8 +19,13 @@ class TicketModel extends BaseModel {
         "name",
         "description",
         "price",
+        "image",
         "created_at",
         "updated_at",
         "deleted_at"
     ];
+
+    public function getImageAttribute() {
+        return env("APP_URL") . "/storage/tickets/" . $this->attributes["image"];
+    }
 }

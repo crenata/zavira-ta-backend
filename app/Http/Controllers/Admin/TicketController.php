@@ -3,6 +3,7 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Helpers\ResponseHelper;
+use App\Helpers\StorageHelper;
 use App\Http\Controllers\Controller;
 use App\Models\TicketModel;
 use Illuminate\Http\Request;
@@ -25,6 +26,7 @@ class TicketController extends Controller {
         $ticket->name = $request->name;
         $ticket->description = $request->description;
         $ticket->price = $request->price;
+        if ($request->hasFile("image")) $ticket->image = StorageHelper::save($request, "image", "tickets");
         $ticket->save();
 
         return ResponseHelper::response($ticket);

@@ -17,10 +17,11 @@ use Midtrans\Config;
 use Midtrans\Snap;
 
 class TicketController extends Controller {
-    protected string $ticketTable;
+    protected string $ticketTable, $transactionTable;
 
     public function __construct() {
         $this->ticketTable = (new TicketModel())->getTable();
+        $this->transactionTable = (new TransactionModel())->getTable();
     }
 
     public function get(Request $request) {
@@ -75,6 +76,7 @@ class TicketController extends Controller {
                 "name" => $ticket->name,
                 "description" => $ticket->description,
                 "price" => $ticket->price,
+                "image" => $ticket->image,
                 "snap_url" => $snapUrl
             ]);
             TransactionHistoryModel::create([
@@ -88,9 +90,16 @@ class TicketController extends Controller {
 
     public function update(Request $request) {
         $validator = Validator::make($request->all(), [
-            "id" => "required|numeric|exists:$this->ticketTable,id"
+            "order_id" => "required|string|exists:$this->transactionTable,invoice_number",
+            "transaction_status" => "required|string"
         ]);
         if ($validator->fails()) return ResponseHelper::response(null, $validator->errors()->first(), 400);
+
+        $transaction = TransactionModel::where("invoice_number", $request->order_id)->first();
+        TransactionHistoryModel::create([
+            "transaction_id" => $transaction->id,
+            "status" => MidtransStatusConstant::getValueByName(strtoupper($request->transaction_status))
+        ]);
 
         return ResponseHelper::response();
     }

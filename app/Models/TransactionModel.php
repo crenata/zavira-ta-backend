@@ -21,11 +21,16 @@ class TransactionModel extends BaseModel {
         "name",
         "description",
         "price",
+        "image",
         "snap_url",
         "created_at",
         "updated_at",
         "deleted_at"
     ];
+
+    public function getImageAttribute() {
+        return env("APP_URL") . "/storage/tickets/" . $this->attributes["image"];
+    }
 
     public function user() {
         return $this->belongsTo(UserModel::class, "user_id");

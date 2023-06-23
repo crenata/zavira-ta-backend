@@ -23,6 +23,7 @@ return new class extends Migration {
             $table->string("name");
             $table->longText("description");
             $table->unsignedBigInteger("price");
+            $table->string("image");
             $table->string("snap_url");
             $table->unsignedBigInteger("check_in")->nullable();
             $table->unsignedBigInteger("check_out")->nullable();
