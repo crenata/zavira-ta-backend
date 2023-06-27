@@ -12,6 +12,7 @@ Route::namespace(ucfirst(ApiConstant::PREFIX_USER))->group(function () {
     Route::prefix(ApiConstant::PREFIX_TICKET)->group(__DIR__ . "/" . ApiConstant::PREFIX_TICKET . ".php");
     Route::prefix(ApiConstant::PREFIX_PENYU)->group(__DIR__ . "/" . ApiConstant::PREFIX_PENYU . ".php");
     Route::prefix(ApiConstant::PREFIX_CONSERVATION)->group(__DIR__ . "/" . ApiConstant::PREFIX_CONSERVATION . ".php");
+    Route::prefix(ApiConstant::PREFIX_TERUMBU)->group(__DIR__ . "/" . ApiConstant::PREFIX_TERUMBU . ".php");
 
     Route::middleware([TokenConstant::AUTH_SANCTUM, TokenConstant::AUTH_USER])->group(function () {
         Route::prefix(ApiConstant::PREFIX_COMPLAINT)->group(__DIR__ . "/" . ApiConstant::PREFIX_COMPLAINT . ".php");

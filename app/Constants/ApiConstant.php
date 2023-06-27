@@ -16,4 +16,5 @@ class ApiConstant {
     const PREFIX_PENYU = "penyu";
     const PREFIX_CONSERVATION = "conservation";
     const PREFIX_CITY = "city";
+    const PREFIX_TERUMBU = "terumbu";
 }

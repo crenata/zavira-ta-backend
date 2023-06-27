@@ -17,4 +17,5 @@ Route::middleware([TokenConstant::AUTH_SANCTUM, TokenConstant::AUTH_ADMIN])
     Route::prefix(ApiConstant::PREFIX_PENYU)->group(__DIR__ . "/" . ApiConstant::PREFIX_PENYU . ".php");
     Route::prefix(ApiConstant::PREFIX_CONSERVATION)->group(__DIR__ . "/" . ApiConstant::PREFIX_CONSERVATION . ".php");
     Route::prefix(ApiConstant::PREFIX_CITY)->group(__DIR__ . "/" . ApiConstant::PREFIX_CITY . ".php");
+    Route::prefix(ApiConstant::PREFIX_TERUMBU)->group(__DIR__ . "/" . ApiConstant::PREFIX_TERUMBU . ".php");
 });
