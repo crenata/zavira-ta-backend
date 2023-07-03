@@ -21,7 +21,7 @@ return new class extends Migration {
             $table->unsignedBigInteger("city_id");
             $table->string("name");
             $table->string("zone");
-            $table->unsignedBigInteger("percentage");
+            $table->unsignedDouble("percentage");
             $table->year("year");
             $this->timestamps($table);
             $this->softDeletes($table);

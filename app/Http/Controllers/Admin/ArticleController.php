@@ -38,7 +38,7 @@ class ArticleController extends Controller {
         $validator = Validator::make($request->all(), [
             "title" => "required|string",
             "description" => "required|string",
-            "image" => "required|file|image",
+            "image" => "nullable|file|image",
             "type" => ["required", "numeric", Rule::in([ArticleTypeConstant::HOME, ArticleTypeConstant::PROGRAM, ArticleTypeConstant::INFORMATION, ArticleTypeConstant::SOP])]
         ]);
         if ($validator->fails()) return ResponseHelper::response(null, $validator->errors()->first(), 400);
@@ -51,7 +51,7 @@ class ArticleController extends Controller {
             "id" => "required|numeric|exists:$this->articleTable,id",
             "title" => "required|string",
             "description" => "required|string",
-            "image" => "required",
+            "image" => "nullable",
             "type" => ["required", "numeric", Rule::in([ArticleTypeConstant::HOME, ArticleTypeConstant::PROGRAM, ArticleTypeConstant::INFORMATION, ArticleTypeConstant::SOP])]
         ]);
         if ($validator->fails()) return ResponseHelper::response(null, $validator->errors()->first(), 400);

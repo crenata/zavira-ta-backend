@@ -26,6 +26,7 @@ class ArticleModel extends BaseModel {
     ];
 
     public function getImageAttribute() {
-        return env("APP_URL") . "/storage/articles/" . $this->attributes["image"];
+        if (!empty($this->attributes["image"])) return env("APP_URL") . "/storage/articles/" . $this->attributes["image"];
+        return null;
     }
 }

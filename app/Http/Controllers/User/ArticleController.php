@@ -27,9 +27,9 @@ class ArticleController extends Controller {
         return ResponseHelper::response($articles);
     }
     public function getInformation(Request $request) {
-        $articles = ArticleModel::where("type", ArticleTypeConstant::INFORMATION)->orderByDesc("id")->paginate();
+        $article = ArticleModel::where("type", ArticleTypeConstant::INFORMATION)->orderByDesc("id")->first();
 
-        return ResponseHelper::response($articles);
+        return ResponseHelper::response($article);
     }
     public function getSop(Request $request) {
         $articles = ArticleModel::where("type", ArticleTypeConstant::SOP)->orderByDesc("id")->paginate();
