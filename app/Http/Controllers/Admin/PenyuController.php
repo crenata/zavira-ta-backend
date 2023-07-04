@@ -33,7 +33,7 @@ class PenyuController extends Controller {
         ]);
         if ($validator->fails()) return ResponseHelper::response(null, $validator->errors()->first(), 400);
 
-        $penyus = PenyuModel::whereRaw("date_part('year', date) = $year")
+        $penyus = PenyuModel::whereRaw("extract(year from date) = $year")
             ->get();
 
         return ResponseHelper::response($penyus);
