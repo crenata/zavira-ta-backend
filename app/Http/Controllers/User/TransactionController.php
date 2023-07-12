@@ -7,8 +7,10 @@ use App\Helpers\ResponseHelper;
 use App\Http\Controllers\Controller;
 use App\Models\TransactionHistoryModel;
 use App\Models\TransactionModel;
+use Barryvdh\DomPDF\Facade\Pdf;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Facades\Validator;
 
 class TransactionController extends Controller {
     protected $transactionTable, $transactionHistoryTable;
@@ -66,5 +68,20 @@ class TransactionController extends Controller {
                 MidtransStatusConstant::CHECK_IN
             ]) . ")"
         ]));
+    }
+
+    public function generate(Request $request, $id) {
+        $validator = Validator::make([
+            "id" => $id,
+        ], [
+            "id" => "required|numeric|exists:$this->transactionTable,id"
+        ]);
+        if ($validator->fails()) return ResponseHelper::response(null, $validator->errors()->first(), 400);
+
+        $transaction = TransactionModel::with("latestHistory", "histories", "user")->find($id);
+
+        return Pdf::loadView("pdfs.invoice", [
+            "transaction" => $transaction
+        ])->download("{$transaction->invoice_number}.pdf");
     }
 }
