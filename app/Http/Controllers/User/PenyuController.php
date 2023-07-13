@@ -10,10 +10,8 @@ use Illuminate\Support\Facades\Validator;
 
 class PenyuController extends Controller {
     public function years(Request $request) {
-        $years = PenyuModel::selectRaw(implode(",", [
-            "extract(year from date) as year"
-        ]))
-            ->groupByRaw("1")
+        $years = PenyuModel::select("year")
+            ->distinct()
             ->pluck("year");
 
         return ResponseHelper::response($years);
@@ -27,8 +25,7 @@ class PenyuController extends Controller {
         ]);
         if ($validator->fails()) return ResponseHelper::response(null, $validator->errors()->first(), 400);
 
-        $penyus = PenyuModel::whereRaw("extract(year from date) = $year")
-            ->get();
+        $penyus = PenyuModel::where("year", $year)->get();
 
         return ResponseHelper::response($penyus);
     }

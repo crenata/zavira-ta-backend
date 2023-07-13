@@ -17,10 +17,12 @@ return new class extends Migration {
     public function up() {
         Schema::create($this->getTable(new PenyuModel()), function (Blueprint $table) {
             $table->id();
+            $table->unsignedBigInteger("adopt")->nullable();
             $table->unsignedBigInteger("menetas")->nullable();
             $table->unsignedBigInteger("gagal_menetas")->nullable();
-            $table->unsignedBigInteger("jumlah_telur")->nullable();
-            $table->date("date")->unique();
+            $table->unsignedBigInteger("belum_menetas")->nullable();
+            $table->year("year");
+            $table->string("month");
             $this->timestamps($table);
             $this->softDeletes($table);
         });
