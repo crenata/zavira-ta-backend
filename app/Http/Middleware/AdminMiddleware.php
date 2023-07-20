@@ -17,10 +17,10 @@ class AdminMiddleware {
      */
     public function handle(Request $request, Closure $next) {
         $path = str_replace("api/v1/admin/", "", $request->path());
-        if (auth()->user()->type === AdminTypeConstant::ADMINISTRATOR) return $next($request);
-        if (auth()->user()->type === AdminTypeConstant::CHIEF && $this->canChief($path)) return $next($request);
-        if (auth()->user()->type === AdminTypeConstant::STAFF && $this->canStaff($path)) return $next($request);
-        if (auth()->user()->type === AdminTypeConstant::MANAGER && $this->canManager($path)) return $next($request);
+        if ((int) auth()->user()->type === AdminTypeConstant::ADMINISTRATOR) return $next($request);
+        if ((int) auth()->user()->type === AdminTypeConstant::CHIEF && $this->canChief($path)) return $next($request);
+        if ((int) auth()->user()->type === AdminTypeConstant::STAFF && $this->canStaff($path)) return $next($request);
+        if ((int) auth()->user()->type === AdminTypeConstant::MANAGER && $this->canManager($path)) return $next($request);
         return ResponseHelper::response(null, "Unauthenticated", 401);
     }
 
