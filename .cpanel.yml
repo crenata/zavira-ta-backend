@@ -1,0 +1,5 @@
+deployment:
+  tasks:
+    - export DEPLOYPATH=/home/uptj9171/public_html/api.uptdkpsdkpsumbar.com/
+    - /bin/cp -R * $DEPLOYPATH
+    - cd $DEPLOYPATH
