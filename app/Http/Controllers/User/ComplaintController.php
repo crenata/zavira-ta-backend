@@ -6,6 +6,7 @@ use App\Constants\ComplaintStatusConstant;
 use App\Helpers\ResponseHelper;
 use App\Helpers\StorageHelper;
 use App\Http\Controllers\Controller;
+use App\Models\CityModel;
 use App\Models\ComplaintHistoryModel;
 use App\Models\ComplaintModel;
 use Illuminate\Http\Request;
@@ -14,11 +15,18 @@ use Illuminate\Support\Facades\Validator;
 use Illuminate\Validation\Rule;
 
 class ComplaintController extends Controller {
-    protected string $complaintTable, $complaintHistoryTable;
+    protected string $complaintTable, $complaintHistoryTable, $cityTable;
 
     public function __construct() {
         $this->complaintTable = (new ComplaintModel())->getTable();
         $this->complaintHistoryTable = (new ComplaintHistoryModel())->getTable();
+        $this->cityTable = (new CityModel())->getTable();
+    }
+
+    public function getCity(Request $request) {
+        $cities = CityModel::all();
+
+        return ResponseHelper::response($cities);
     }
 
     public function get(Request $request) {
@@ -34,7 +42,7 @@ class ComplaintController extends Controller {
         $detailData = DB::table("$this->complaintHistoryTable as detail_data")
             ->selectRaw("detail_data.id, detail_data.status")
             ->toSql();
-        $complaints = ComplaintModel::with("latestHistory", "histories", "user")
+        $complaints = ComplaintModel::with("latestHistory", "histories", "user", "city")
             ->select("$this->complaintTable.*")
             ->leftJoinSub(
                 $detailIds,
@@ -62,21 +70,23 @@ class ComplaintController extends Controller {
             "name" => "required|string",
             "subject" => "required|string",
             "description" => "required|string",
-            "location" => "required|string",
+            "location" => "required|numeric|exists:$this->cityTable,id",
             "date" => "required|string|date",
-            "image" => "required|file|image"
+            "image" => "required|file|image",
+            "video" => "required|file|mimes:mp4,mov,MP2T,x-mpegURL,x-flv,3gpp,quicktime,x-msvideo,x-ms-wmv"
         ]);
         if ($validator->fails()) return ResponseHelper::response(null, $validator->errors()->first(), 400);
 
         return DB::transaction(function () use ($request) {
             $complaint = ComplaintModel::create([
                 "user_id" => auth()->id(),
+                "city_id" => $request->location,
                 "name" => $request->name,
                 "subject" => $request->subject,
                 "description" => $request->description,
-                "location" => $request->location,
                 "date" => $request->date,
-                "image" => StorageHelper::save($request, "image", "complaints")
+                "image" => StorageHelper::save($request, "image", "complaints"),
+                "video" => StorageHelper::save($request, "video", "complaints")
             ]);
 
             ComplaintHistoryModel::create([

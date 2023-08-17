@@ -34,7 +34,7 @@ class ComplaintController extends Controller {
         $detailData = DB::table("$this->complaintHistoryTable as detail_data")
             ->selectRaw("detail_data.id, detail_data.status")
             ->toSql();
-        $complaints = ComplaintModel::with("latestHistory", "histories", "user")
+        $complaints = ComplaintModel::with("latestHistory", "histories", "user", "city")
             ->select("$this->complaintTable.*")
             ->leftJoinSub(
                 $detailIds,

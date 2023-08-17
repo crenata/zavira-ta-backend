@@ -17,12 +17,13 @@ class ComplaintModel extends BaseModel {
      */
     protected $fillable = [
         "user_id",
+        "city_id",
         "name",
         "subject",
         "description",
-        "location",
         "date",
         "image",
+        "video",
         "created_at",
         "updated_at",
         "deleted_at"
@@ -32,8 +33,16 @@ class ComplaintModel extends BaseModel {
         return env("APP_URL") . "/storage/complaints/" . $this->attributes["image"];
     }
 
+    public function getVideoAttribute() {
+        return env("APP_URL") . "/storage/complaints/" . $this->attributes["video"];
+    }
+
     public function user() {
         return $this->belongsTo(UserModel::class, "user_id");
+    }
+
+    public function city() {
+        return $this->belongsTo(CityModel::class, "city_id");
     }
 
     public function histories() {

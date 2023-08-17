@@ -1,5 +1,6 @@
 <?php
 
+use App\Models\CityModel;
 use App\Models\ComplaintModel;
 use App\Models\UserModel;
 use App\Traits\MigrationTrait;
@@ -19,16 +20,18 @@ return new class extends Migration {
         Schema::create($this->getTable(new ComplaintModel()), function (Blueprint $table) {
             $table->id();
             $table->unsignedBigInteger("user_id");
+            $table->unsignedBigInteger("city_id");
             $table->string("name");
             $table->string("subject");
             $table->longText("description");
-            $table->longText("location");
             $table->date("date");
             $table->string("image");
+            $table->string("video");
             $this->timestamps($table);
             $this->softDeletes($table);
 
             $table->foreign("user_id")->references("id")->on($this->getTable(new UserModel()))->onDelete("cascade");
+            $table->foreign("city_id")->references("id")->on($this->getTable(new CityModel()))->onDelete("cascade");
         });
     }
 
