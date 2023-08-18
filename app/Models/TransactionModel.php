@@ -23,6 +23,11 @@ class TransactionModel extends BaseModel {
         "price",
         "image",
         "snap_url",
+        "date",
+        "quantity",
+        "gross_amount",
+        "check_in",
+        "check_out",
         "created_at",
         "updated_at",
         "deleted_at"

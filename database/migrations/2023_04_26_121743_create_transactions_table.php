@@ -25,6 +25,9 @@ return new class extends Migration {
             $table->unsignedBigInteger("price");
             $table->string("image");
             $table->string("snap_url");
+            $table->date("date");
+            $table->unsignedBigInteger("quantity");
+            $table->unsignedBigInteger("gross_amount");
             $table->unsignedBigInteger("check_in")->nullable();
             $table->unsignedBigInteger("check_out")->nullable();
             $this->timestamps($table);

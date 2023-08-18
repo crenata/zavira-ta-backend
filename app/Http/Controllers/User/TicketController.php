@@ -43,19 +43,20 @@ class TicketController extends Controller {
         return ResponseHelper::response($tickets);
     }
 
-    public function buy(Request $request, $id) {
-        $validator = Validator::make([
-            "id" => $id
-        ], [
-            "id" => "required|numeric|exists:$this->ticketTable,id"
+    public function buy(Request $request) {
+        $validator = Validator::make($request->all(), [
+            "id" => "required|numeric|exists:$this->ticketTable,id",
+            "quantity" => "required|numeric|min:1",
+            "date" => "required|string|date"
         ]);
         if ($validator->fails()) return ResponseHelper::response(null, $validator->errors()->first(), 400);
 
-        return DB::transaction(function () use ($id) {
-            $ticket = TicketModel::find($id);
+        return DB::transaction(function () use ($request) {
+            $ticket = TicketModel::find($request->id);
 
             $now = Carbon::now();
             $invoiceNumber = $now->format("Y-") . Str::random(4) . $now->format("-m-") . Str::random(4) . $now->format("-d-") . Str::random(12);
+            $grossAmount = $ticket->price * $request->integer("quantity");
 
             Config::$serverKey = env("MIDTRANS_SERVER_KEY");
             Config::$isProduction = env("MIDTRANS_PRODUCTION");
@@ -66,7 +67,7 @@ class TicketController extends Controller {
             $snapUrl = Snap::getSnapUrl([
                 "transaction_details" => [
                     "order_id" => $invoiceNumber,
-                    "gross_amount" => $ticket->price
+                    "gross_amount" => $grossAmount
                 ]
             ]);
 
@@ -77,7 +78,10 @@ class TicketController extends Controller {
                 "description" => $ticket->description,
                 "price" => $ticket->price,
                 "image" => $ticket->image,
-                "snap_url" => $snapUrl
+                "snap_url" => $snapUrl,
+                "quantity" => $request->quantity,
+                "date" => $request->date,
+                "gross_amount" => $grossAmount
             ]);
             TransactionHistoryModel::create([
                 "transaction_id" => $transaction->id,

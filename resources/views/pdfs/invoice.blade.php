@@ -76,9 +76,11 @@
     <div class="mt-3">
         <p class="m-0">Nama : {{ $transaction->user->name }}</p>
         <p class="m-0">Jenis Tiket : {{ $transaction->name }}</p>
-        <p class="m-0">Tanggal Pemesanan : {{ \Illuminate\Support\Carbon::parse($transaction->user->created_at)->timezone("Asia/Jakarta")->format("d M Y") }}</p>
-        <p class="m-0">Tanggal Kunjungan : {{ \Illuminate\Support\Carbon::parse($transaction->user->created_at)->timezone("Asia/Jakarta")->addDay()->format("d M Y") }}</p>
+        <p class="m-0">Tanggal Pemesanan : {{ \Illuminate\Support\Carbon::parse($transaction->created_at)->timezone("Asia/Jakarta")->format("d M Y") }}</p>
+        <p class="m-0">Tanggal Kunjungan : {{ \Illuminate\Support\Carbon::parse($transaction->date)->timezone("Asia/Jakarta")->addDay()->format("d M Y") }}</p>
+        <p class="m-0">Jumlah : {{ number_format($transaction->quantity) }}</p>
         <p class="m-0">Harga : Rp{{ number_format($transaction->price) }}</p>
+        <p class="m-0">Total : Rp{{ number_format($transaction->gross_amount) }}</p>
         <p class="m-0">Invoice : {{ $transaction->invoice_number }}</p>
     </div>
 </div>
