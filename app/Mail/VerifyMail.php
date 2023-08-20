@@ -35,7 +35,7 @@ class VerifyMail extends Mailable {
      */
     public function content(): Content {
         return new Content(
-            view: "emails.password-reset",
+            view: "emails.verify",
             with: [
                 "url" => env("APP_URL_FRONTEND") . "/user/verify/$this->token"
             ]
