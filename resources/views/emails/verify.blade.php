@@ -7,6 +7,6 @@
     <title>UPTD KPSDKP</title>
 </head>
 <body>
-<a href="{{$url}}" class="">Click Here to Verify</a>
+<a href="{{$url}}" class="">Silahkan Klik Untuk Verifikasi Akun</a>
 </body>
 </html>
