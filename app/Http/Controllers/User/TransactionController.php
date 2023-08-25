@@ -44,7 +44,9 @@ class TransactionController extends Controller {
                 "=",
                 "detail_max.detail_id"
             )
-            ->whereRaw(implode(" and ", $conditions))
+            ->whereRaw(implode(" and ", array_merge([
+                "$this->transactionTable.user_id = " . auth()->id()
+            ], $conditions)))
             ->orderByDesc("$this->transactionTable.id");
 
         if (empty($id)) $data = $data->paginate();
@@ -55,6 +57,7 @@ class TransactionController extends Controller {
 
     public function get(Request $request) {
         $data = TransactionModel::with("latestHistory", "histories")
+            ->where("user_id", auth()->id())
             ->orderByDesc("id")
             ->paginate();
 
